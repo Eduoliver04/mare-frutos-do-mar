@@ -12,8 +12,13 @@ const modal = document.getElementById("modal");
 const modalCorpo = document.getElementById("modal-corpo");
 const fecharModalBtn = document.getElementById("fechar-modal");
 
-function mostrarStatus(mensagem) {
+function mostrarStatus(mensagem, tipo = "") {
   areaStatus.textContent = mensagem;
+  areaStatus.className = "status" + (tipo ? " " + tipo : "");
+}
+
+function limparStatus() {
+  mostrarStatus("");
 }
 
 function limparResultado() {
@@ -24,27 +29,52 @@ async function buscarPorNome(termo) {
   limparResultado();
   mostrarStatus("Carregando receitas...");
 
-  const resposta = await fetch(`${BASE_URL}/search.php?s=${encodeURIComponent(termo)}`);
-  const dados = await resposta.json();
+  try {
+    const resposta = await fetch(`${BASE_URL}/search.php?s=${encodeURIComponent(termo)}`);
 
-  if (!dados.meals) {
-    mostrarStatus(`Nenhuma receita encontrada para "${termo}".`);
-    return;
+    if (!resposta.ok) {
+      throw new Error("A API não respondeu corretamente.");
+    }
+
+    const dados = await resposta.json();
+
+    if (!dados.meals) {
+      mostrarStatus(`Nenhuma receita encontrada para "${termo}". Tente outro termo, como "shrimp" ou "salmon".`, "erro");
+      return;
+    }
+
+    limparStatus();
+    renderizarCartoes(dados.meals);
+  } catch (erro) {
+    mostrarStatus("Ops! Não foi possível falar com a API agora. Verifique sua conexão e tente novamente.", "erro");
+    console.error("Erro ao buscar por nome:", erro);
   }
-
-  mostrarStatus("");
-  renderizarCartoes(dados.meals);
 }
 
 async function explorarFrutosDoMar() {
   limparResultado();
   mostrarStatus("Carregando frutos do mar...");
 
-  const resposta = await fetch(`${BASE_URL}/filter.php?c=Seafood`);
-  const dados = await resposta.json();
+  try {
+    const resposta = await fetch(`${BASE_URL}/filter.php?c=Seafood`);
 
-  mostrarStatus("");
-  renderizarCartoes(dados.meals, { resumido: true });
+    if (!resposta.ok) {
+      throw new Error("A API não respondeu corretamente.");
+    }
+
+    const dados = await resposta.json();
+
+    if (!dados.meals) {
+      mostrarStatus("Nenhuma receita de frutos do mar foi encontrada no momento.", "erro");
+      return;
+    }
+
+    limparStatus();
+    renderizarCartoes(dados.meals, { resumido: true });
+  } catch (erro) {
+    mostrarStatus("Ops! A API de receitas parece estar fora do ar. Tente novamente em instantes.", "erro");
+    console.error("Erro ao explorar frutos do mar:", erro);
+  }
 }
 
 function renderizarCartoes(receitas, { resumido = false } = {}) {
@@ -78,7 +108,11 @@ function renderizarCartoes(receitas, { resumido = false } = {}) {
 formBusca.addEventListener("submit", (evento) => {
   evento.preventDefault();
   const termo = campoBusca.value.trim();
-  if (termo) buscarPorNome(termo);
+  if (!termo) {
+    mostrarStatus("Digite o nome de uma receita para buscar.", "erro");
+    return;
+  }
+  buscarPorNome(termo);
 });
 
 botaoExplorar.addEventListener("click", explorarFrutosDoMar);
