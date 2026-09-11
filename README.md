@@ -1,7 +1,7 @@
 # Maré — Receitas de Frutos do Mar
 
 ## Autor
-Eduardo — Matrícula 0000000
+Eduardo Gabriel de Oliveira Santos — Matrícula 22505511
 <!-- Substitua pela sua matrícula real -->
 
 ## Descrição
