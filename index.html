@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maré — Receitas de Frutos do Mar</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
+</head>
+<body>
+
+  <header class="topo">
+    <div class="topo-conteudo">
+      <h1>🌊 Maré</h1>
+      <p>Descubra receitas de frutos do mar de todo o mundo</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="busca" aria-label="Buscar receitas">
+      <form id="form-busca" class="form-busca">
+        <label for="campo-busca" class="sr-only">Nome da receita</label>
+        <input
+          type="text"
+          id="campo-busca"
+          placeholder="Buscar por nome (ex.: shrimp, salmon, fish...)"
+          autocomplete="off"
+        >
+        <button type="submit" id="botao-buscar">Buscar</button>
+      </form>
+      <button id="botao-explorar" class="botao-secundario">
+        🐟 Explorar todas de frutos do mar
+      </button>
+    </section>
+
+    <section id="status" class="status" aria-live="polite"></section>
+
+    <section id="resultado" class="grade-resultados"></section>
+
+  </main>
+
+  <!-- Modal de detalhes da receita -->
+  <div id="modal" class="modal escondido">
+    <div class="modal-conteudo">
+      <button id="fechar-modal" class="fechar-modal" aria-label="Fechar">&times;</button>
+      <div id="modal-corpo"></div>
+    </div>
+  </div>
+
+  <footer class="rodape">
+    <p>Dados fornecidos por <a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener">TheMealDB</a> · Projeto acadêmico — Bootcamp II</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
