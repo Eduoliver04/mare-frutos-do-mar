@@ -12,6 +12,8 @@ const modal = document.getElementById("modal");
 const modalCorpo = document.getElementById("modal-corpo");
 const fecharModalBtn = document.getElementById("fechar-modal");
 
+// ---------- Utilitários de UI ----------
+
 function mostrarStatus(mensagem, tipo = "") {
   areaStatus.textContent = mensagem;
   areaStatus.className = "status" + (tipo ? " " + tipo : "");
@@ -24,6 +26,9 @@ function limparStatus() {
 function limparResultado() {
   areaResultado.innerHTML = "";
 }
+
+// ---------- Busca por nome (search.php) ----------
+// Retorna objetos completos: strMeal, strCategory, strArea, strMealThumb, strInstructions, ingredientes...
 
 async function buscarPorNome(termo) {
   limparResultado();
@@ -51,6 +56,9 @@ async function buscarPorNome(termo) {
   }
 }
 
+// ---------- Explorar categoria Seafood (filter.php) ----------
+// Retorna apenas idMeal, strMeal e strMealThumb — detalhes completos vêm no clique (lookup.php)
+
 async function explorarFrutosDoMar() {
   limparResultado();
   mostrarStatus("Carregando frutos do mar...");
@@ -77,33 +85,113 @@ async function explorarFrutosDoMar() {
   }
 }
 
+// ---------- Renderização da grade de cartões ----------
+
 function renderizarCartoes(receitas, { resumido = false } = {}) {
   const grade = document.createDocumentFragment();
 
   receitas.forEach((receita) => {
     const cartao = document.createElement("article");
     cartao.className = "cartao";
+    cartao.tabIndex = 0;
+    cartao.setAttribute("role", "button");
+    cartao.setAttribute("aria-label", `Ver detalhes de ${receita.strMeal}`);
 
     const tags = resumido
-      ? `<span class="tag coral">Frutos do mar</span>`
+      ? `<span class="tag coral">Clique para ver detalhes</span>`
       : `
         <span class="tag">${receita.strCategory ?? "—"}</span>
         <span class="tag coral">${receita.strArea ?? "—"}</span>
       `;
 
     cartao.innerHTML = `
-      <img src="${receita.strMealThumb}" alt="Foto do prato ${receita.strMeal}">
+      <img src="${receita.strMealThumb}" alt="Foto do prato ${receita.strMeal}" loading="lazy">
       <div class="cartao-corpo">
         <h3>${receita.strMeal}</h3>
         <div class="tag-linha">${tags}</div>
       </div>
     `;
 
+    const abrir = () => abrirDetalhes(receita.idMeal);
+    cartao.addEventListener("click", abrir);
+    cartao.addEventListener("keydown", (evento) => {
+      if (evento.key === "Enter" || evento.key === " ") {
+        evento.preventDefault();
+        abrir();
+      }
+    });
+
     grade.appendChild(cartao);
   });
 
   areaResultado.appendChild(grade);
 }
+
+// ---------- Detalhes de uma receita (lookup.php) ----------
+
+async function abrirDetalhes(idMeal) {
+  modalCorpo.innerHTML = "<p>Carregando detalhes...</p>";
+  modal.classList.remove("escondido");
+
+  try {
+    const resposta = await fetch(`${BASE_URL}/lookup.php?i=${encodeURIComponent(idMeal)}`);
+
+    if (!resposta.ok) {
+      throw new Error("A API não respondeu corretamente.");
+    }
+
+    const dados = await resposta.json();
+    const receita = dados.meals ? dados.meals[0] : null;
+
+    if (!receita) {
+      modalCorpo.innerHTML = "<p>Não foi possível carregar os detalhes desta receita.</p>";
+      return;
+    }
+
+    modalCorpo.innerHTML = montarHtmlDetalhes(receita);
+  } catch (erro) {
+    modalCorpo.innerHTML = "<p>Ops! Não foi possível carregar os detalhes agora. Tente novamente.</p>";
+    console.error("Erro ao carregar detalhes:", erro);
+  }
+}
+
+function montarHtmlDetalhes(receita) {
+  const ingredientes = listarIngredientes(receita)
+    .map((item) => `<li>${item}</li>`)
+    .join("");
+
+  const linkVideo = receita.strYoutube
+    ? `<p class="detalhe-links"><a href="${receita.strYoutube}" target="_blank" rel="noopener">Ver vídeo no YouTube</a></p>`
+    : "";
+
+  return `
+    <img class="detalhe-img" src="${receita.strMealThumb}" alt="Foto do prato ${receita.strMeal}">
+    <h2 class="detalhe-titulo">${receita.strMeal}</h2>
+    <div class="tag-linha">
+      <span class="tag">${receita.strCategory ?? "—"}</span>
+      <span class="tag coral">${receita.strArea ?? "—"}</span>
+    </div>
+    <h3>Ingredientes</h3>
+    <ul class="detalhe-ingredientes">${ingredientes}</ul>
+    <h3>Modo de preparo</h3>
+    <p class="detalhe-instrucoes">${receita.strInstructions}</p>
+    ${linkVideo}
+  `;
+}
+
+function listarIngredientes(receita) {
+  const lista = [];
+  for (let i = 1; i <= 20; i++) {
+    const ingrediente = receita[`strIngredient${i}`];
+    const medida = receita[`strMeasure${i}`];
+    if (ingrediente && ingrediente.trim()) {
+      lista.push(`${ingrediente}${medida && medida.trim() ? ` — ${medida.trim()}` : ""}`);
+    }
+  }
+  return lista;
+}
+
+// ---------- Eventos ----------
 
 formBusca.addEventListener("submit", (evento) => {
   evento.preventDefault();
@@ -117,4 +205,19 @@ formBusca.addEventListener("submit", (evento) => {
 
 botaoExplorar.addEventListener("click", explorarFrutosDoMar);
 
+fecharModalBtn.addEventListener("click", () => modal.classList.add("escondido"));
+
+modal.addEventListener("click", (evento) => {
+  if (evento.target === modal) {
+    modal.classList.add("escondido");
+  }
+});
+
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape") {
+    modal.classList.add("escondido");
+  }
+});
+
+// Carrega frutos do mar automaticamente ao abrir a página
 explorarFrutosDoMar();
