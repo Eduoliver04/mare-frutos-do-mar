@@ -1,11 +1,17 @@
 # Maré — Receitas de Frutos do Mar
 
+**▶ Ver funcionando:** https://eduoliver04.github.io/mare-frutos-do-mar/
+
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black) ![Fetch API](https://img.shields.io/badge/API-TheMealDB-2e7d32)
+
 ## Autor
 Eduardo Gabriel de Oliveira Santos — Matrícula 22505511
-<!-- Substitua pela sua matrícula real -->
 
 ## Descrição
 Aplicação web que permite buscar receitas por nome ou explorar um catálogo de receitas de frutos do mar de diversas culinárias do mundo, exibindo ingredientes, modo de preparo e origem de cada prato.
+
+## Tecnologias
+HTML, CSS e JavaScript puro (sem frameworks), com `fetch` e `async/await` para consumir a API.
 
 ## API utilizada
 - **TheMealDB** — [documentação](https://www.themealdb.com/api.php)
