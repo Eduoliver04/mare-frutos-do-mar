@@ -1,0 +1,12 @@
+# Arquivos de controle de versao e documentacao nao precisam ir para dentro
+# da imagem: isso deixa a imagem menor e o build mais rapido, alem de evitar
+# vazar metadados do repositorio (historico do .git, rascunhos, etc).
+.git
+.gitignore
+.dockerignore
+Dockerfile
+README.md
+*.md
+*.log
+.DS_Store
+node_modules
