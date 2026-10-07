@@ -38,6 +38,14 @@
 
     <section id="resultado" class="grade-resultados"></section>
 
+    <section class="favoritos-secao" aria-label="Meus favoritos">
+      <h2>⭐ Meus favoritos</h2>
+      <p id="favoritos-vazio" class="favoritos-vazio">
+        Você ainda não tem receitas favoritas. Abra os detalhes de uma receita e clique em "Favoritar".
+      </p>
+      <ul id="favoritos-lista" class="favoritos-lista"></ul>
+    </section>
+
   </main>
 
   <!-- Modal de detalhes da receita -->
@@ -52,6 +60,58 @@
     <p>Dados fornecidos por <a href="https://www.themealdb.com/api.php" target="_blank" rel="noopener">TheMealDB</a> · Projeto acadêmico — Bootcamp II</p>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- ===== Persistência (Supabase) =====
+       Etapa 02: salva/lista/remove favoritos num banco Postgres real.
+       Substitua SUPABASE_URL e SUPABASE_ANON_KEY pelas suas (Project Settings -> API no Supabase).
+       A chave "anon public" é feita para ser exposta no frontend. -->
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "SUPABASE_URL_AQUI";
+    const SUPABASE_ANON_KEY = "SUPABASE_ANON_KEY_AQUI";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    window.favoritosDB = {
+      async listar() {
+        const { data, error } = await supabase
+          .from("favoritos")
+          .select("*")
+          .order("criado_em", { ascending: false });
+        if (error) {
+          console.error("Erro ao listar favoritos:", error);
+          return [];
+        }
+        return data;
+      },
+
+      async salvar(nomeItem, dadosExtra) {
+        const { error } = await supabase
+          .from("favoritos")
+          .insert({ nome_item: nomeItem, dados_extra: dadosExtra });
+        if (error) console.error("Erro ao salvar favorito:", error);
+        return !error;
+      },
+
+      async atualizar(id, dadosExtra) {
+        const { error } = await supabase
+          .from("favoritos")
+          .update({ dados_extra: dadosExtra })
+          .eq("id", id);
+        if (error) console.error("Erro ao atualizar favorito:", error);
+        return !error;
+      },
+
+      async remover(id) {
+        const { error } = await supabase.from("favoritos").delete().eq("id", id);
+        if (error) console.error("Erro ao remover favorito:", error);
+        return !error;
+      },
+    };
+
+    window.dispatchEvent(new Event("favoritosdb-pronto"));
+  </script>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
