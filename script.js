@@ -232,7 +232,9 @@ async function abrirDetalhes(idMeal) {
       return;
     }
 
-    modalCorpo.innerHTML = await montarHtmlDetalhes(receita);
+    const { html, nomeTraduzido } = await montarHtmlDetalhes(receita);
+    modalCorpo.innerHTML = html;
+    configurarBotaoFavoritar(receita, nomeTraduzido);
   } catch (erro) {
     modalCorpo.innerHTML = "<p>Ops! Não foi possível carregar os detalhes agora. Tente novamente.</p>";
     console.error("Erro ao carregar detalhes:", erro);
@@ -269,7 +271,7 @@ async function montarHtmlDetalhes(receita) {
     ? `<p class="detalhe-links"><a href="${receita.strYoutube}" target="_blank" rel="noopener">Ver vídeo no YouTube</a></p>`
     : "";
 
-  return `
+  const html = `
     <img class="detalhe-img" src="${receita.strMealThumb}" alt="Foto do prato ${nomeTraduzido}">
     <h2 class="detalhe-titulo">${nomeTraduzido}</h2>
     <div class="tag-linha">
@@ -281,7 +283,17 @@ async function montarHtmlDetalhes(receita) {
     <h3>Modo de preparo</h3>
     <p class="detalhe-instrucoes">${instrucoesFinal}</p>
     ${linkVideo}
+
+    <div class="favoritar-box">
+      <h3>Adicionar aos favoritos</h3>
+      <label for="nota-favorito" class="sr-only">Anotação pessoal</label>
+      <textarea id="nota-favorito" placeholder="Escreva uma anotação pessoal (opcional)"></textarea>
+      <button id="botao-favoritar" type="button" class="botao-secundario">⭐ Favoritar esta receita</button>
+      <p id="favoritar-status" class="favoritar-status"></p>
+    </div>
   `;
+
+  return { html, nomeTraduzido };
 }
 
 function listarIngredientes(receita) {
@@ -290,10 +302,80 @@ function listarIngredientes(receita) {
     const ingrediente = receita[`strIngredient${i}`];
     const medida = receita[`strMeasure${i}`];
     if (ingrediente && ingrediente.trim()) {
-      lista.push(`${ingrediente}${ medida && medida.trim() ? ` — ${medida.trim()}` : ""}`);
+      lista.push(`${ingrediente}${medida && medida.trim() ? ` — ${medida.trim()}` : ""}`);
     }
   }
   return lista;
+}
+
+// ---------- Favoritos (persistência via Supabase) ----------
+
+async function carregarFavoritos() {
+  if (!window.favoritosDB) return;
+  const favoritos = await window.favoritosDB.listar();
+  renderizarFavoritos(favoritos);
+}
+
+function renderizarFavoritos(favoritos) {
+  const lista = document.getElementById("favoritos-lista");
+  const vazio = document.getElementById("favoritos-vazio");
+  if (!lista || !vazio) return;
+
+  lista.innerHTML = "";
+
+  if (!favoritos || favoritos.length === 0) {
+    vazio.hidden = false;
+    return;
+  }
+  vazio.hidden = true;
+
+  favoritos.forEach((favorito) => {
+    const nota = favorito.dados_extra?.nota;
+    const imagem = favorito.dados_extra?.imagem;
+
+    const item = document.createElement("li");
+    item.className = "favorito-item";
+    item.innerHTML = `
+      ${imagem ? `<img src="${imagem}" alt="Foto do prato ${favorito.nome_item}">` : ""}
+      <div class="favorito-corpo">
+        <strong>${favorito.nome_item}</strong>
+        ${nota ? `<p class="favorito-nota">${nota}</p>` : ""}
+      </div>
+      <button type="button" class="favorito-remover" aria-label="Remover favorito">&times;</button>
+    `;
+
+    item.querySelector(".favorito-remover").addEventListener("click", async () => {
+      await window.favoritosDB.remover(favorito.id);
+      carregarFavoritos();
+    });
+
+    lista.appendChild(item);
+  });
+}
+
+function configurarBotaoFavoritar(receita, nomeTraduzido) {
+  const botao = document.getElementById("botao-favoritar");
+  const nota = document.getElementById("nota-favorito");
+  const status = document.getElementById("favoritar-status");
+  if (!botao) return;
+
+  botao.addEventListener("click", async () => {
+    if (!window.favoritosDB) {
+      status.textContent = "Favoritos indisponíveis agora.";
+      return;
+    }
+    status.textContent = "Salvando...";
+    const ok = await window.favoritosDB.salvar(nomeTraduzido, {
+      nota: nota.value.trim(),
+      idMeal: receita.idMeal,
+      imagem: receita.strMealThumb,
+    });
+    status.textContent = ok ? "Favoritado! ⭐" : "Não foi possível salvar agora.";
+    if (ok) {
+      nota.value = "";
+      carregarFavoritos();
+    }
+  });
 }
 
 // ---------- Eventos ----------
@@ -326,3 +408,10 @@ document.addEventListener("keydown", (evento) => {
 
 // Carrega frutos do mar automaticamente ao abrir a página
 explorarFrutosDoMar();
+
+// Carrega os favoritos salvos (espera o Supabase ficar pronto, se preciso)
+if (window.favoritosDB) {
+  carregarFavoritos();
+} else {
+  window.addEventListener("favoritosdb-pronto", carregarFavoritos);
+}
