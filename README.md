@@ -1,8 +1,8 @@
 # Maré — Receitas de Frutos do Mar
 
 ## Autor
-Eduardo — Matrícula 0000000
-<!-- Substitua pela sua matrícula real -->
+Eduardo — RA 22505511
+Data de entrega: 07/10/2026
 
 ## Descrição
 Aplicação web que permite buscar receitas por nome ou explorar um catálogo de receitas de frutos do mar de diversas culinárias do mundo, exibindo ingredientes, modo de preparo e origem de cada prato. Agora também permite salvar receitas como favoritas, com uma anotação pessoal, em um banco de dados real.
