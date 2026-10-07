@@ -285,3 +285,101 @@ button:active {
 .rodape a {
   color: var(--azul-mar);
 }
+
+/* ===== Favoritos (persistência) ===== */
+.favoritos-secao {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+  margin-top: 2rem;
+}
+
+.favoritos-secao h2 {
+  margin: 0 0 0.75rem;
+  color: var(--azul-profundo);
+  font-size: 1.2rem;
+}
+
+.favoritos-vazio {
+  color: var(--cinza);
+  margin: 0;
+}
+
+.favoritos-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.favorito-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--azul-claro);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+}
+
+.favorito-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.favorito-corpo {
+  flex: 1;
+  min-width: 0;
+}
+
+.favorito-corpo strong {
+  color: var(--azul-profundo);
+}
+
+.favorito-nota {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: var(--texto);
+}
+
+.favorito-remover {
+  background: none;
+  color: var(--coral);
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0.2rem 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ===== Caixa de favoritar (dentro do modal) ===== */
+.favoritar-box {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--borda);
+}
+
+.favoritar-box h3 {
+  margin-top: 0;
+}
+
+.favoritar-box textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.6rem;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 0.6rem;
+}
+
+.favoritar-status {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--cinza);
+}
