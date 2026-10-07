@@ -1,0 +1,12 @@
+# Arquivos de sistema operacional e de editores que nao fazem parte do projeto
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Dependencias (caso algum dia sejam adicionadas ferramentas de build)
+node_modules/
+
+# Logs e arquivos temporarios
+*.log
+*.tmp
