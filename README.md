@@ -1,11 +1,18 @@
 # Maré — Receitas de Frutos do Mar
 
-## Autor
-Eduardo — RA 22505511
-Data de entrega: 07/10/2026
+> Projeto evoluído ao longo do Bootcamp II: Etapa 01 (frontend + API pública), Etapa 02 (persistência real + Docker) e Etapa 03 (trabalho em grupo com fluxo de PR, revisão e CI).
+
+## Integrantes (Etapa 03)
+
+| Nome | Matrícula | GitHub | Funcionalidade | PR principal |
+|---|---|---|---|---|
+| Eduardo Gabriel de Oliveira Santos | 22505511 | [@Eduoliver04](https://github.com/Eduoliver04) | Frontend, busca/exibição de receitas, persistência (Supabase), CRUD de favoritos | _pendente_ |
+| Leonardo Jiahao Lin Chen | 22510052 | [@leonardojiahao-bit](https://github.com/leonardojiahao-bit) | Testes automatizados, GitHub Actions (CI), Docker Hub | _pendente_ |
+
+_Links de PR preenchidos conforme cada funcionalidade for mesclada na `main`._
 
 ## Descrição
-Aplicação web que permite buscar receitas por nome ou explorar um catálogo de receitas de frutos do mar de diversas culinárias do mundo, exibindo ingredientes, modo de preparo e origem de cada prato. Agora também permite salvar receitas como favoritas, com uma anotação pessoal, em um banco de dados real.
+Aplicação web que permite buscar receitas por nome ou explorar um catálogo de receitas de frutos do mar de diversas culinárias do mundo, exibindo ingredientes, modo de preparo e origem de cada prato. Permite salvar receitas como favoritas, com uma anotação pessoal, em um banco de dados real.
 
 ## API utilizada
 - **TheMealDB** — [documentação](https://www.themealdb.com/api.php)
@@ -22,7 +29,7 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
 - **Favoritar uma receita com uma anotação pessoal**, listar os favoritos salvos e removê-los — tudo persistido em um banco de dados real (sobrevive ao fechar o navegador).
 - Mensagens amigáveis quando a busca não retorna resultados ou quando a API está indisponível.
 
-## Persistência de dados (Etapa 02)
+## Persistência de dados
 - **Banco:** Supabase (PostgreSQL).
 - **Tabela `favoritos`:**
 
@@ -34,7 +41,22 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
   | `dados_extra` | `jsonb` | `{ "nota": "...", "idMeal": "...", "imagem": "..." }` — anotação pessoal, id da receita na TheMealDB e url da foto |
 
 - **CRUD implementado:** criar (favoritar), listar (seção "Meus favoritos", carregada ao abrir a página) e excluir (botão "×" em cada favorito). Edição (update) também está implementada: favoritar a mesma receita novamente com uma nota diferente atualiza a anotação.
-- **Limitação conhecida:** nesta etapa as políticas de RLS da tabela `favoritos` estão abertas para o papel `anon` (leitura, escrita e exclusão livres), conforme sugerido no enunciado. Isso significa que qualquer visitante do site pode ver/alterar os favoritos de qualquer outra pessoa — aceitável para este exercício, mas não para produção.
+- **Limitação conhecida:** as políticas de RLS da tabela `favoritos` estão abertas para o papel `anon` (leitura, escrita e exclusão livres), conforme sugerido no enunciado. Aceitável para este exercício, mas não para produção.
+
+## Fluxo de colaboração (Etapa 03)
+- A branch `main` é protegida: exige Pull Request com pelo menos 1 aprovação de outro integrante antes do merge.
+- Padrão de nome de branch: `feature/nome-da-funcionalidade` (ex.: `feature/testes-ci`, `feature/docker-hub`).
+- Toda PR tem título claro, descrição (o que foi feito / por que / como testar) e um revisor designado, que comenta antes de aprovar.
+- Checks do GitHub Actions (CI) precisam estar verdes para o merge ser permitido.
+
+## Testes automatizados
+_Seção preenchida por Leonardo assim que o workflow de CI e os testes forem mesclados na `main`._
+- Framework: a definir conforme a stack (Jest, caso a suíte de testes use Node).
+- Como rodar localmente: `npm install && npm test` (instruções finais a confirmar na PR de CI).
+
+## Evidências
+- **Print da PR bloqueada pelo CI:** _a adicionar após o "teste de fogo" da Fase 3 (PR com teste quebrando de propósito)._
+- **Relato de conflito de merge resolvido:** _a adicionar se/quando ocorrer durante o trabalho em paralelo das duas features._
 
 ## Empacotamento com Docker
 A aplicação é servida por um Nginx dentro de um container Docker.
@@ -45,7 +67,7 @@ docker run -d -p 8080:80 SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar:latest
 
 Depois, abra **http://localhost:8080**.
 
-### Sidequests
+### Sidequests (Etapa 02)
 - **SQ1 — `.dockerignore`:** exclui `.git`, `README.md`, `Dockerfile` e arquivos de log/rascunho da imagem. Isso deixa a imagem menor (menos camadas e bytes copiados) e o build mais rápido, já que o Docker não precisa processar arquivos que a aplicação não usa em tempo de execução.
 - **SQ2 — versionamento:** publicadas as tags `1.0`, `1.1` e `latest` no Docker Hub.
 - **SQ3 — overview do Docker Hub:** preenchido com descrição, o comando `docker run` e o link do repositório GitHub.
