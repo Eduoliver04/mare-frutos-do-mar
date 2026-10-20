@@ -1,0 +1,12 @@
+{
+  "name": "mare-frutos-do-mar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mare - Receitas de Frutos do Mar (Bootcamp II)",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
