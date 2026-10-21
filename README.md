@@ -86,7 +86,7 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
 A aplicação é servida por um Nginx dentro de um container Docker. A imagem inclui `index.html`, `style.css`, `script.js` e `utils.js`.
 
 ```
-docker run -d -p 8080:80 SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar:latest
+docker run -d -p 8080:80 eduoliver04/mare-frutos-do-mar:latest
 ```
 
 Depois, abra **http://localhost:8080**.
@@ -116,4 +116,4 @@ Depois, abra **http://localhost:8080**.
 - **Repositório:** https://github.com/Eduoliver04/mare-frutos-do-mar
 - **Pull Requests da Etapa 03:** https://github.com/Eduoliver04/mare-frutos-do-mar/pulls?q=is%3Apr
 - **Execuções do CI (GitHub Actions):** https://github.com/Eduoliver04/mare-frutos-do-mar/actions
-- **Imagem no Docker Hub:** https://hub.docker.com/r/SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar
+- **Imagem no Docker Hub:** https://hub.docker.com/r/eduoliver04/mare-frutos-do-mar
