@@ -242,7 +242,7 @@ async function abrirDetalhes(idMeal) {
 }
 
 async function montarHtmlDetalhes(receita) {
-  const ingredientesOriginais = listarIngredientes(receita);
+  const ingredientesOriginais = window.MareUtils.listarIngredientes(receita);
   const instrucoesProtegidas = (receita.strInstructions || "").replace(
     /\r\n|\r|\n/g,
     MARCADOR_QUEBRA_LINHA
@@ -296,18 +296,6 @@ async function montarHtmlDetalhes(receita) {
   return { html, nomeTraduzido };
 }
 
-function listarIngredientes(receita) {
-  const lista = [];
-  for (let i = 1; i <= 20; i++) {
-    const ingrediente = receita[`strIngredient${i}`];
-    const medida = receita[`strMeasure${i}`];
-    if (ingrediente && ingrediente.trim()) {
-      lista.push(`${ingrediente}${medida && medida.trim() ? ` — ${medida.trim()}` : ""}`);
-    }
-  }
-  return lista;
-}
-
 // ---------- Favoritos (persistência via Supabase) ----------
 
 async function carregarFavoritos() {
@@ -332,6 +320,7 @@ function renderizarFavoritos(favoritos) {
   favoritos.forEach((favorito) => {
     const nota = favorito.dados_extra?.nota;
     const imagem = favorito.dados_extra?.imagem;
+    const rotuloCompleto = window.MareUtils.formatarRotuloFavorito(favorito.nome_item, nota);
 
     const item = document.createElement("li");
     item.className = "favorito-item";
@@ -341,7 +330,7 @@ function renderizarFavoritos(favoritos) {
         <strong>${favorito.nome_item}</strong>
         ${nota ? `<p class="favorito-nota">${nota}</p>` : ""}
       </div>
-      <button type="button" class="favorito-remover" aria-label="Remover favorito">&times;</button>
+      <button type="button" class="favorito-remover" aria-label="Remover favorito: ${rotuloCompleto}">&times;</button>
     `;
 
     item.querySelector(".favorito-remover").addEventListener("click", async () => {
@@ -383,7 +372,7 @@ function configurarBotaoFavoritar(receita, nomeTraduzido) {
 formBusca.addEventListener("submit", (evento) => {
   evento.preventDefault();
   const termo = campoBusca.value.trim();
-  if (!termo) {
+  if (!window.MareUtils.validarTermoBusca(termo)) {
     mostrarStatus("Digite o nome de uma receita para buscar.", "erro");
     return;
   }
