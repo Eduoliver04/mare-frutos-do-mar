@@ -79,7 +79,7 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
 - **CI:** o workflow `.github/workflows/ci.yml` ("CI - Testes") roda `npm install` e `npm test` a cada Pull Request e a cada push na `main`. O job se chama `testes` e é um check obrigatório para o merge.
 
 ## Evidências
-- **PR bloqueada pelo CI:** _a adicionar — print de uma PR com um teste quebrado de propósito, mostrando o check `testes` vermelho e o merge bloqueado._
+- **PR bloqueada pelo CI ("teste de fogo"):** a [PR #4](https://github.com/Eduoliver04/mare-frutos-do-mar/pull/4) inverte de propósito a expectativa de um teste em `utils.test.js`. O check obrigatório `testes` falhou ([execução do CI](https://github.com/Eduoliver04/mare-frutos-do-mar/actions/runs/39659767814/job/119429421312)) e o GitHub bloqueou o merge ("All checks have failed" / "Merging is blocked"). A PR fica aberta, sem merge, apenas como evidência.
 - **Conflito de merge:** não houve conflito durante a Etapa 03. As duas branches (`feature/utils-compartilhados` e `feature/testes-ci`) adicionaram o arquivo `utils.js` com conteúdo idêntico, então o Git combinou as duas versões automaticamente no merge da PR #1, depois que a PR #2 já tinha entrado na `main`.
 
 ## Empacotamento com Docker
