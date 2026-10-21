@@ -6,10 +6,10 @@
 
 | Nome | Matrícula | GitHub | Funcionalidade | PR principal |
 |---|---|---|---|---|
-| Eduardo Gabriel de Oliveira Santos | 22505511 | [@Eduoliver04](https://github.com/Eduoliver04) | Frontend, busca/exibição de receitas, persistência (Supabase), CRUD de favoritos | _pendente_ |
-| Leonardo Jiahao Lin Chen | 22510052 | [@leonardojiahao-bit](https://github.com/leonardojiahao-bit) | Testes automatizados, GitHub Actions (CI), Docker Hub | _pendente_ |
+| Eduardo Gabriel de Oliveira Santos | 22505511 | [@Eduoliver04](https://github.com/Eduoliver04) | Frontend, busca/exibição de receitas, persistência (Supabase), CRUD de favoritos, extração das funções compartilhadas em `utils.js` | [#1 — Extrai utils.js compartilhado](https://github.com/Eduoliver04/mare-frutos-do-mar/pull/1) |
+| Leonardo Jiahao Lin Chen | 22510052 | [@leonardojiahao-bit](https://github.com/leonardojiahao-bit) | Testes automatizados (Jest), GitHub Actions (CI), Docker Hub | [#2 — Adiciona testes automatizados e workflow de CI](https://github.com/Eduoliver04/mare-frutos-do-mar/pull/2) |
 
-_Links de PR preenchidos conforme cada funcionalidade for mesclada na `main`._
+Cada PR foi revisada e aprovada pelo outro integrante antes do merge: a #1 foi revisada por Leonardo e a #2 por Eduardo.
 
 ## Descrição
 Aplicação web que permite buscar receitas por nome ou explorar um catálogo de receitas de frutos do mar de diversas culinárias do mundo, exibindo ingredientes, modo de preparo e origem de cada prato. Permite salvar receitas como favoritas, com uma anotação pessoal, em um banco de dados real.
@@ -29,6 +29,19 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
 - **Favoritar uma receita com uma anotação pessoal**, listar os favoritos salvos e removê-los — tudo persistido em um banco de dados real (sobrevive ao fechar o navegador).
 - Mensagens amigáveis quando a busca não retorna resultados ou quando a API está indisponível.
 
+## Estrutura do projeto
+
+| Arquivo | Papel |
+|---|---|
+| `index.html` | Página da aplicação; carrega `utils.js` antes de `script.js` |
+| `style.css` | Estilos |
+| `script.js` | Lógica da interface: busca, catálogo, modal de detalhes e CRUD de favoritos |
+| `utils.js` | Funções puras compartilhadas (`validarTermoBusca`, `listarIngredientes`, `formatarRotuloFavorito`), usadas no navegador via `window.MareUtils` e nos testes via `module.exports` |
+| `utils.test.js` | Testes automatizados (Jest) das funções de `utils.js` |
+| `package.json` | Dependência de desenvolvimento (Jest) e script `npm test` |
+| `.github/workflows/ci.yml` | Workflow do GitHub Actions que roda os testes |
+| `Dockerfile` / `.dockerignore` | Empacotamento da aplicação com Nginx |
+
 ## Persistência de dados
 - **Banco:** Supabase (PostgreSQL).
 - **Tabela `favoritos`:**
@@ -44,22 +57,33 @@ Aplicação web que permite buscar receitas por nome ou explorar um catálogo de
 - **Limitação conhecida:** as políticas de RLS da tabela `favoritos` estão abertas para o papel `anon` (leitura, escrita e exclusão livres), conforme sugerido no enunciado. Aceitável para este exercício, mas não para produção.
 
 ## Fluxo de colaboração (Etapa 03)
-- A branch `main` é protegida: exige Pull Request com pelo menos 1 aprovação de outro integrante antes do merge.
-- Padrão de nome de branch: `feature/nome-da-funcionalidade` (ex.: `feature/testes-ci`, `feature/docker-hub`).
+- A branch `main` é protegida por uma regra que exige:
+  - Pull Request para qualquer mudança (nada é enviado direto para a `main`);
+  - pelo menos 1 aprovação de outro integrante;
+  - o check **`testes`** do GitHub Actions passando.
+- Padrão de nome de branch: `feature/nome-da-funcionalidade` (ex.: `feature/utils-compartilhados`, `feature/testes-ci`); ajustes de documentação usam `docs/...`.
 - Toda PR tem título claro, descrição (o que foi feito / por que / como testar) e um revisor designado, que comenta antes de aprovar.
-- Checks do GitHub Actions (CI) precisam estar verdes para o merge ser permitido.
 
 ## Testes automatizados
-_Seção preenchida por Leonardo assim que o workflow de CI e os testes forem mesclados na `main`._
-- Framework: a definir conforme a stack (Jest, caso a suíte de testes use Node).
-- Como rodar localmente: `npm install && npm test` (instruções finais a confirmar na PR de CI).
+- **Framework:** [Jest](https://jestjs.io/) 29, rodando em Node.js 20.
+- **O que é testado** (`utils.test.js`, 4 testes):
+  - `validarTermoBusca` rejeita termos vazios ou só com espaços;
+  - `validarTermoBusca` aceita um termo válido;
+  - `listarIngredientes` lista só os ingredientes preenchidos, com a medida quando houver;
+  - `formatarRotuloFavorito` monta o rótulo com e sem anotação, e usa "Receita sem nome" quando o nome está vazio.
+- **Como rodar localmente:**
+  ```
+  npm install
+  npm test
+  ```
+- **CI:** o workflow `.github/workflows/ci.yml` ("CI - Testes") roda `npm install` e `npm test` a cada Pull Request e a cada push na `main`. O job se chama `testes` e é um check obrigatório para o merge.
 
 ## Evidências
-- **Print da PR bloqueada pelo CI:** _a adicionar após o "teste de fogo" da Fase 3 (PR com teste quebrando de propósito)._
-- **Relato de conflito de merge resolvido:** _a adicionar se/quando ocorrer durante o trabalho em paralelo das duas features._
+- **PR bloqueada pelo CI:** _a adicionar — print de uma PR com um teste quebrado de propósito, mostrando o check `testes` vermelho e o merge bloqueado._
+- **Conflito de merge:** não houve conflito durante a Etapa 03. As duas branches (`feature/utils-compartilhados` e `feature/testes-ci`) adicionaram o arquivo `utils.js` com conteúdo idêntico, então o Git combinou as duas versões automaticamente no merge da PR #1, depois que a PR #2 já tinha entrado na `main`.
 
 ## Empacotamento com Docker
-A aplicação é servida por um Nginx dentro de um container Docker.
+A aplicação é servida por um Nginx dentro de um container Docker. A imagem inclui `index.html`, `style.css`, `script.js` e `utils.js`.
 
 ```
 docker run -d -p 8080:80 SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar:latest
@@ -68,16 +92,16 @@ docker run -d -p 8080:80 SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar:latest
 Depois, abra **http://localhost:8080**.
 
 ### Sidequests (Etapa 02)
-- **SQ1 — `.dockerignore`:** exclui `.git`, `README.md`, `Dockerfile` e arquivos de log/rascunho da imagem. Isso deixa a imagem menor (menos camadas e bytes copiados) e o build mais rápido, já que o Docker não precisa processar arquivos que a aplicação não usa em tempo de execução.
+- **SQ1 — `.dockerignore`:** exclui `.git`, `README.md`, `Dockerfile`, `node_modules` e arquivos de log/rascunho da imagem. Isso deixa a imagem menor (menos camadas e bytes copiados) e o build mais rápido, já que o Docker não precisa processar arquivos que a aplicação não usa em tempo de execução.
 - **SQ2 — versionamento:** publicadas as tags `1.0`, `1.1` e `latest` no Docker Hub.
 - **SQ3 — overview do Docker Hub:** preenchido com descrição, o comando `docker run` e o link do repositório GitHub.
-- **SQ4 — dois containers simultâneos:** ver print em `docs/docker-ps.png` (ou seção abaixo) mostrando dois containers da mesma imagem rodando nas portas 8080 e 8081.
+- **SQ4 — dois containers simultâneos:** _print a adicionar em `docs/docker-ps.png`_, mostrando dois containers da mesma imagem rodando nas portas 8080 e 8081.
 
   **Se eu tivesse 100 containers, como gerenciaria?** Rodar e atualizar 100 containers manualmente com `docker run`/`docker stop` um por um não escala: não há como distribuir carga entre eles, substituir automaticamente um que caiu, ou atualizar a versão sem downtime. É exatamente esse problema que o **Kubernetes** resolve: ele organiza containers em **Pods** (a menor unidade executável, um ou mais containers que sempre rodam juntos), agrupa Pods idênticos em um **Deployment** com um número desejado de **réplicas**, e distribui esses Pods entre as máquinas de um **cluster** (um conjunto de servidores gerenciados como um só). Se um Pod falha, o Kubernetes cria outro automaticamente para manter o número de réplicas; se a demanda cresce, basta aumentar o número de réplicas (ou configurar autoscaling) e o cluster se reorganiza para acomodar. Ou seja: em vez de eu gerenciar 100 containers um a um, eu descrevo o estado desejado (esta imagem, estas réplicas, estes recursos) e o Kubernetes cuida de manter esse estado — é a ponte entre "rodar um container" e "operar um sistema em produção".
 
 ## Como executar localmente
 1. Clone: `git clone https://github.com/Eduoliver04/mare-frutos-do-mar.git`
-2. Abra o arquivo `index.html` no navegador (ou use a extensão Live Server do VS Code)
+2. Abra o arquivo `index.html` no navegador (ou use a extensão Live Server do VS Code).
 
    **Ou, via Docker:**
    ```
@@ -85,8 +109,11 @@ Depois, abra **http://localhost:8080**.
    docker run -d -p 8080:80 mare-frutos-do-mar
    ```
    Depois abra http://localhost:8080.
+3. Para rodar os testes: `npm install && npm test` (requer Node.js).
 
 ## Links
 - **Aplicação no ar (GitHub Pages):** https://eduoliver04.github.io/mare-frutos-do-mar/
 - **Repositório:** https://github.com/Eduoliver04/mare-frutos-do-mar
+- **Pull Requests da Etapa 03:** https://github.com/Eduoliver04/mare-frutos-do-mar/pulls?q=is%3Apr
+- **Execuções do CI (GitHub Actions):** https://github.com/Eduoliver04/mare-frutos-do-mar/actions
 - **Imagem no Docker Hub:** https://hub.docker.com/r/SEU_USUARIO_DOCKERHUB/mare-frutos-do-mar
