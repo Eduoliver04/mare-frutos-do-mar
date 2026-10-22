@@ -93,9 +93,11 @@ Depois, abra **http://localhost:8080**.
 
 ### Sidequests (Etapa 02)
 - **SQ1 — `.dockerignore`:** exclui `.git`, `README.md`, `Dockerfile`, `node_modules` e arquivos de log/rascunho da imagem. Isso deixa a imagem menor (menos camadas e bytes copiados) e o build mais rápido, já que o Docker não precisa processar arquivos que a aplicação não usa em tempo de execução.
-- **SQ2 — versionamento:** publicadas as tags `1.0`, `1.1` e `latest` no Docker Hub.
+- **SQ2 — versionamento:** publicadas no [Docker Hub](https://hub.docker.com/r/eduoliver04/mare-frutos-do-mar/tags) as tags `1.0` (versão do fim da Etapa 02), `1.1` e `latest` (versão atual, com `utils.js` e favoritos conectados ao Supabase).
 - **SQ3 — overview do Docker Hub:** preenchido com descrição, o comando `docker run` e o link do repositório GitHub.
-- **SQ4 — dois containers simultâneos:** _print a adicionar em `docs/docker-ps.png`_, mostrando dois containers da mesma imagem rodando nas portas 8080 e 8081.
+- **SQ4 — dois containers simultâneos:** dois containers da mesma imagem (`mare1` e `mare2`) rodando ao mesmo tempo, nas portas 8080 e 8081 (print do Docker Desktop):
+
+  ![Dois containers do Maré rodando nas portas 8080 e 8081](docs/sq4-dois-containers.png)
 
   **Se eu tivesse 100 containers, como gerenciaria?** Rodar e atualizar 100 containers manualmente com `docker run`/`docker stop` um por um não escala: não há como distribuir carga entre eles, substituir automaticamente um que caiu, ou atualizar a versão sem downtime. É exatamente esse problema que o **Kubernetes** resolve: ele organiza containers em **Pods** (a menor unidade executável, um ou mais containers que sempre rodam juntos), agrupa Pods idênticos em um **Deployment** com um número desejado de **réplicas**, e distribui esses Pods entre as máquinas de um **cluster** (um conjunto de servidores gerenciados como um só). Se um Pod falha, o Kubernetes cria outro automaticamente para manter o número de réplicas; se a demanda cresce, basta aumentar o número de réplicas (ou configurar autoscaling) e o cluster se reorganiza para acomodar. Ou seja: em vez de eu gerenciar 100 containers um a um, eu descrevo o estado desejado (esta imagem, estas réplicas, estes recursos) e o Kubernetes cuida de manter esse estado — é a ponte entre "rodar um container" e "operar um sistema em produção".
 
