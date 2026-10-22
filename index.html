@@ -62,13 +62,13 @@
 
   <!-- ===== Persistência (Supabase) =====
        Etapa 02: salva/lista/remove favoritos num banco Postgres real.
-       Substitua SUPABASE_URL e SUPABASE_ANON_KEY pelas suas (Project Settings -> API no Supabase).
+       URL do projeto e chave publica (publishable) do Supabase (Project Settings -> API Keys).
        A chave "anon public" é feita para ser exposta no frontend. -->
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_URL = "SUPABASE_URL_AQUI";
-    const SUPABASE_ANON_KEY = "SUPABASE_ANON_KEY_AQUI";
+    const SUPABASE_URL = "https://fhyahhuieqqkgbplekrr.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_waaaTkO3L4PcJNkaaLNKfg_y3nRz62I";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
