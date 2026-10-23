@@ -6,7 +6,8 @@ test("rejeita termo de busca vazio", () => {
 });
 
 test("aceita termo de busca valido", () => {
-  expect(validarTermoBusca("shrimp")).toBe(true);
+  // Teste de fogo: expectativa invertida de proposito para provar que o CI bloqueia o merge
+  expect(validarTermoBusca("shrimp")).toBe(false);
 });
 
 test("lista apenas ingredientes preenchidos, com medida quando houver", () => {
